@@ -1,0 +1,13 @@
+Hands-on TrixiSW
+
+Patrick Ersing
+Linköping University
+
+and
+
+Andrew Winters
+Linköping University
+
+Something about the background and features of what TrixiSW can do. Some of the ecosystem related to TrixiBT. Features that we want to develop. Demonstrate how to setup a flooding simulation. We can focus on flooding downtown Cologne with the L1 spline topography.
+
+Need to figure out the setup myself of what kind of initial condition and boundary conditions that make an interesting showcase. How "realistic" do we want to make this setup?
