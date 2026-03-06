@@ -1,0 +1,174 @@
+!
+! A pseudo BNF syntax for HOHQMesh control file dictionaries
+! The TYPE and LIST keys are internal and not used in the
+! control files, but are used to store the type stored by 
+! the dictionary entry and for lists of objects like multiple
+! inner boundaries or multiple refinement regions.
+!
+!
+!
+!      A Control file dictionary contains the keys
+!         CONTROL_INPUT
+!         MODEL
+!
+!      The CONTROL_INPUT dictionary contains the keys
+!         RUN_PARAMETERS
+!         MESH_PARAMETERS
+!         SPRING_SMOOTHER
+!         REFINEMENT_REGIONS
+!         SCALE_TRANSFORMATION
+!         ROTATION_TRANSFORMATION
+!         SIMPLE_EXTRUSION
+!         SIMPLE_ROTATION
+!         SWEEP_ALONG_CURVE
+!
+!      The MODEL dictionary contains the keys
+!         OUTER_BOUNDARY
+!         INNER_BOUNDARIES
+!         SWEEP_CURVE
+!         SWEEP_SCALE_FACTOR
+!         TOPOGRAPHY
+!      
+!      The OUTER_BOUNDARY dictionary contains the keys
+!         TYPE
+!         LIST
+!           The list contains dictionaries describing
+!               PARAMETRIC_EQUATION_CURVE
+!               SPLINE_CURVE
+!               END_POINTS_LINE
+!               CIRCULAR_ARC
+!               ELLIPTIC_ARC
+!
+!      The INNER_BOUNDARIES dictionary contains the keys
+!         TYPE
+!         LIST
+!            The list contains CHAIN dictionaries
+!      
+!      A CHAIN dictionary contains the keys
+!         TYPE
+!         LIST
+!            The list will contain dictionaries of type
+!                PARAMETRIC_EQUATION_CURVE
+!                SPLINE_CURVE
+!                END_POINTS_LINE
+!                CIRCULAR_ARC
+!                ELLIPTIC_ARC
+!
+!      A PARAMETRIC_EQUATION_CURVE dictionary contains the keys
+!         TYPE
+!         name
+!         xEqn
+!         yEqn
+!         zEqn
+!
+!      A SPLINE_CURVE block contains the keys
+!         TYPE
+!         name
+!         SPLINE_DATA /OR/ file
+!
+!      SPLINE_DATA block contains keys and data
+!         nKnots
+!         t_1 x_1 y_1 z_1
+!         t_2 x_2 y_2 z_2
+!         ...
+!         t_nKnots x_nKnots y_nKnots z_nKnots
+!
+!
+!      An END_POINTS_LINE has the following keys
+!         TYPE
+!         name
+!         xStart
+!         xEnd
+!
+!      A CIRCULAR_ARC block contains
+!         TYPE
+!         name
+!         units
+!         center
+!         radius
+!         start angle
+!         end angle
+!
+!      An ELLIPTIC_ARC block contains
+!         TYPE
+!         name
+!         units
+!         center
+!         xRadius
+!         yRadius
+!         start angle
+!         end angle
+!         rotation
+!
+!      REFINEMENT_REGIONS dictionary contains the keys
+!         TYPE
+!         LIST
+!            LIST is a list of 
+!                REFINEMENT_CENTER
+!                REFINEMENT_LINE
+!
+!      A REFINEMENT_CENTER contains the keys
+!         TYPE
+!         center
+!         h
+!         w
+!
+!      A REFINEMENT_LINE contains the keys
+!         TYPE
+!         xStart
+!         xEnd
+!         h
+!         w
+!      
+!      
+!      A ROTATION_TRANSFORMATION contains the keys
+!         TYPE
+!         direction
+!         rotationPoint
+!
+!      A SCALE_TRANSFORMATION contains the keys
+!         TYPE
+!         origin
+!         scaleFactor
+!      
+!      The SWEEP_CURVE dictionary contains the keys
+!         TYPE
+!         LIST
+!           The list contains dictionaries describing
+!               PARAMETRIC_EQUATION_CURVE
+!               SPLINE_CURVE
+!               END_POINTS_LINE
+!      
+!      The SWEEP_SCALE_FACTOR dictionary contains the keys
+!         TYPE
+!         LIST
+!           The list contains dictionaries describing
+!               PARAMETRIC_EQUATION
+!
+!        But the equation definitions contain only one equation r(t) = ...
+!
+!      the TOPOGRAPHY dictionary contains the keys
+!         TYPE
+!         eqn (for equation defined topography)
+!         sizing
+!
+!      SIMPLE_EXTRUSION contains the keys
+!         direction
+!         height
+!         subdivisions
+!         start surface name
+!         end surface name
+!
+!      SIMPLE_ROTATION contains the keys
+!
+!         direction
+!         rotation angle factor
+!         subdivisions
+!         start surface name
+!         end surface name
+!
+!      SWEEP_ALONG_CURVE contains the keys
+!         algorithm   (optional)
+!         subdivisions per segment
+!         start surface name
+!         end surface name
