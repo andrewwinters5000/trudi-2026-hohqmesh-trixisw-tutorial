@@ -1,0 +1,10 @@
+[deps]
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+HOHQMesh = "e4f4c7b8-17cb-445a-93c5-f69190ed6c8c"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+OrdinaryDiffEqSSPRK = "669c94d9-1f4b-4b64-b377-1aa079aa2388"
+Trixi = "a7f1ee26-1774-49b1-8366-f1abc58fbfcb"
+Trixi2Vtk = "bc1476a1-1ca6-4cc3-950b-c312b255ff95"
+TrixiBottomTopography = "86af9953-43df-404b-8eaa-d20d82623a82"
+TrixiShallowWater = "804cb1fc-5b08-4398-a671-a789bfe091b3"

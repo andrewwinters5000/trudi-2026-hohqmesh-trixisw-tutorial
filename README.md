@@ -3,21 +3,26 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 
 This repository contains information and code to reproduce the results presented in the
-article
+hands-on session for HOHQMesh / HOHQMesh.jl and TrixiShallowWater.jl at TRUDI 2026 in Cologne, Germany.
 
-Support files for HOHQMesh and TrixiShallowWater tutorial seesion at TRUDI 2026
-
-TODO: We need to make some Project.toml (and maybe Manifest.toml) files for the two pieces
-
-## Numerical experiments
+## Installation
 
 To reproduce the tutorials presented herein, you need to install [Julia](https://julialang.org/).
-The tutorials were performed using Julia v1.11.3.
+The tutorials were prepared using Julia v1.11.3, but other versions should work, e.g., v 1.10.
 
 First, you need to download this repository, e.g., by cloning it with `git`
-or by downloading an archive via the GitHub interface. Then, you need to start
-Julia in the appropriate directory of this repository, either `HOHQMesh/` or `TrixiSW/`
-and follow the instructions described in the `README.md` file therein.
+or by downloading an archive via the GitHub interface.
+After cloning, you will need to instantiate and install the necessary packages.
+Navigate to the main folder of this repository and execute
+```shell
+julia --project=. -e 'import Pkg; Pkg.instantiate()'
+```
+Then, you can start a Julia REPL
+```shell
+julia --project=.
+```
+There are further instructions described in the `README.md` files in the folders
+`HOHQMesh/` or `TrixiSW/` that discuss how to put together the examples.
 
 ## Authors
 
