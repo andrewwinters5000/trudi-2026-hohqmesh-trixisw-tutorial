@@ -16,6 +16,8 @@ TODO: Could be good to show everyone how to use this nice new feature.
 
 ## Wave run-up and flooding
 
+Below is information on how `elixir_shallowwater_wave_runup_flood.jl` wave constructed.
+
 This example will demonstrate how to:
 - Set up a SWE solver for wet/dry transitions
 - Approximate bathymetry data with [TrixiBottomTopography.jl](https://github.com/trixi-framework/ixiBottomTopography.jl)
