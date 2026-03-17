@@ -15,7 +15,7 @@ bathymetry_data = joinpath(@__DIR__, "dgm_merged.txt")
 spline_struct = LaverySpline2D(bathymetry_data)
 spline_func(x::Float64, y::Float64) = spline_interpolation(spline_struct, x, y)
 
-# H0 based on Cologne has elevation 37 m and the Rhine is about 4 m deep
+# H0 has an elevation 41 m
 equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 41.0,
                                     threshold_desingularization = 1e-8)
 
@@ -29,9 +29,6 @@ function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
     return prim2cons(SVector(H, v1, v2, b), equations)
 end
 
-
-# # function boundary_condition_wave_maker(u_inner, normal_direction::AbstractVector, direction, x, t,
-# #     surface_flux_functions, equations::ShallowWaterEquations2D)
 function boundary_condition_wave_maker(u_inner, normal_direction::AbstractVector, x, t,
                                        surface_flux_functions, equations::ShallowWaterEquations2D)
     surface_flux_function, nonconservative_flux_function = surface_flux_functions
@@ -103,10 +100,7 @@ solver = DGSEM(basis, surface_flux, volume_integral)
 ###############################################################################
 # Get the mesh
 
-coordinates_min = (spline_struct.x[1], spline_struct.y[1])
-coordinates_max = (spline_struct.x[end], spline_struct.y[end])
-
-mesh_file = Trixi.download(https://gist.githubusercontent.com/andrewwinters5000/18cad369281c6a91ab3e2a8303a4e500/raw/c3a55010a13147fea822220c1c890e3932918203/CartesianBox.inp,
+mesh_file = Trixi.download("https://gist.githubusercontent.com/andrewwinters5000/18cad369281c6a91ab3e2a8303a4e500/raw/c3a55010a13147fea822220c1c890e3932918203/CartesianBox.inp",
                            joinpath(@__DIR__, "CartesianBox.inp"))
 mesh = P4estMesh{2}(mesh_file)
 
@@ -128,11 +122,11 @@ analysis_callback = AnalysisCallback(semi, interval = analysis_interval,
 
 alive_callback = AliveCallback(analysis_interval = analysis_interval)
 
-save_solution = SaveSolutionCallback(dt = 1.0,
+save_solution = SaveSolutionCallback(dt = 10.0,
                                      save_initial_solution = true,
                                      save_final_solution = true)
 
-stepsize_callback = StepsizeCallback(cfl = 1.1)
+stepsize_callback = StepsizeCallback(cfl = 1.0)
 
 callbacks = CallbackSet(summary_callback,
                         analysis_callback,
