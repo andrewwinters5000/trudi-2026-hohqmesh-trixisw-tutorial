@@ -1,22 +1,19 @@
 # TRUDI 2026 -- TrixiShallowWater tutorial
 
+1) Step 1: Lake at rest will all Dircihlet or wall
+2) Step 2: add a wave type boundary / input wave at one of the boundaries
+3)
+
 This provides a copy of the slides regarding the TrixiShallowWater.jl features
 as well as the files needed to setup some interesting examples such as a bottom
 topography and flooding run.
 
 Note, the instructions below assume that your Julia REPL is instantiated from the main folder of this repository.
 
-## Play with models in 1D
+## Lake-at-rest over complex bathymetry
 
-TODO: classic vs. multilayer vs. moment (time permitting) and not sure what exactly to do here
-
-## Node-wise limiting
-
-TODO: Could be good to show everyone how to use this nice new feature.
-
-## Wave run-up and flooding
-
-Below is information on how `elixir_shallowwater_wave_runup_flood.jl` wave constructed.
+We begin with the general setup of a lake-at-rest test case with complex bottom topography.
+Below is information on component and how the `elixir_shallowwater_lake_at_rest.jl` is constructed.
 
 This example will demonstrate how to:
 - Set up a SWE solver for wet/dry transitions
@@ -35,7 +32,7 @@ usable by Trixi.jl.
 The optimization packages [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl)
 and [JuMP.jl](https://github.com/jump-dev/JuMP.jl) are needed to create
 an L1 spline approximation for the bottom topography.
-Finally, we include [GLMakie.jl](https://docs.makie.org/stable/) for insitu visualization and Trixi2Vtk.jl for postprocessing.
+Finally, we include [GLMakie.jl](https://docs.makie.org/stable/) for bathymetry visualization and Trixi2Vtk.jl for postprocessing.
 ```julia
 using HOHQMesh
 using OrdinaryDiffEqSSPRK
@@ -72,8 +69,8 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 # Get interpolated points
 z_int_pts = evaluate_two_dimensional_interpolant(spline_func, x_int_pts, y_int_pts)
 
-# OBS! Take the transpose here due to a plotting format quirk
-# (The spline data is actually in the correct format for TrixiShallowWater as is)
+# Note! Take the transpose here due to a plotting format quirk
+# (The spline data is actually in the correct format for TrixiShallowWater.jl as is)
 surface(x_int_pts, y_int_pts, z_int_pts';
         axis = (type = Makie.Axis3,
                        xlabel = "ETRS89\n East", ylabel = "ETRS89\n North", zlabel = "DHHN2016\n Height",
@@ -131,7 +128,7 @@ for the wave runup problem.
 
 For this example we solve the two-dimensional shallow water equations,
 so we use the `ShallowWaterEquations2D`
-and specify the gravitational acceleration to `gravity = 9.812`
+and specify the gravitational acceleration to `gravity = 9.81`
 as well as a background water height `H0 = 41.0`.
 ```julia
 equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 41.0,
@@ -153,7 +150,7 @@ We then create a function to supply the initial condition for the simulation.
     # It is mandatory to shift the water level at dry areas to make sure the water height h
     # stays positive. The system would not be stable for h set to a hard zero due to division by h in
     # the computation of velocity, e.g., (h v) / h. Therefore, a small dry state threshold
-    # with a default value of 5*eps() ≈ 1e-13 in double precision, is set in the constructor above
+    # with a default value of 500*eps() ≈ 1e-13 in double precision, is set in the constructor above
     # for the ShallowWaterEquations and added to the initial condition if h = 0.
     H = max(equations.H0, b + equations.threshold_limiter)
 
@@ -164,62 +161,15 @@ end
 initial_condition = initial_condition_wave;
 ```
 
-For this wave run-up test case a specialized wave maker type of boundary condition
-is needed. For this we create a function that will force the water height in a particular
-window of the top portion of the domain.
-```julia
-@inline function boundary_condition_wave_maker(u_inner, normal_direction::AbstractVector,
-                                               x, t, surface_flux_functions,
-                                               equations::ShallowWaterEquations2D)
-    # Extract the numerical flux functions to compute the conservative and nonconservative
-    # pieces of the approximation
-    surface_flux_function, nonconservative_flux_function = surface_flux_functions
-
-    # Use an exponential window function to put the tsunami in the river mouth
-    # Parameters for a soliton type wave
-    A = 100
-    scal = 10 * 0.25 / (1 * sqrt(log(2)))
-    kx = 1 / sqrt(30)
-    t0 = 26.0
-    arg = ( kx * (t - t0) ) / scal
-    L = 357250
-    w = 225
-    window = exp(-((x[1] - L) / w)^2)
-    eta = window * A * sech(arg)^2
-    H_ext = equations.H0 + eta
-
-    # Create the external water height and internal reference height
-    h_ext = max(equations.threshold_limiter, H_ext - u_inner[4])
-    h0 = max(equations.threshold_limiter, equations.H0 - u_inner[4])
-
-    # Compute the incoming velocity as in Eq. (10) of the paper
-    # "A limiter-based well-balanced discontinuous Galerkin method for shallow-water flows
-    #  with wetting and drying: Triangular grids" by Vater, Beisiegel, and Behrens
-    v2_ext = 2 * (sqrt(equations.gravity * h_ext) - sqrt(equations.gravity * h0))
-
-    # Create the external solution state in the conservative variables
-    u_outer = SVector(h_ext, zero(eltype(x)), -h_ext * v2_ext, u_inner[4])
-
-    # Calculate the boundary flux
-    flux = surface_flux_function(u_inner, u_outer, normal_direction, equations)
-
-    noncons_flux = nonconservative_flux_function(u_inner, u_outer, normal_direction,
-                                                 equations)
-
-    return flux, noncons_flux
-end
-```
-
-We create the tuple that assigns the different boundary conditions
+We create the tuple that assigns the boundary conditions
 to physical boundary names. The names for the square domain, e.g. `Bottom`
-are the default names provided by HOHQMesh. As per the problem definition,
-three of the domain boundaries are outflow and the incident wave maker boundary condition
-implemented above is set at the `Top` domain
+are the default names provided by HOHQMesh.
+For the lake-at-rest test case we set constant BCs at all four domain sides
 ```julia
 boundary_condition = (; Bottom = BoundaryConditionDirichlet(initial_condition),
                         Left = BoundaryConditionDirichlet(initial_condition),
                         Right = BoundaryConditionDirichlet(initial_condition),
-                        Top = boundary_condition_wave_maker)
+                        Top = BoundaryConditionDirichlet(initial_condition))
 ```
 
 Now we construct the approximation space, where we use the discontinuous Galerkin spectral element
@@ -288,11 +238,11 @@ analysis_callback = AnalysisCallback(semi, interval = analysis_interval,
 
 alive_callback = AliveCallback(analysis_interval = analysis_interval)
 
-save_solution = SaveSolutionCallback(dt = 1.0,
+save_solution = SaveSolutionCallback(dt = 10.0,
                                      save_initial_solution = true,
                                      save_final_solution = true)
 
-stepsize_callback = StepsizeCallback(cfl = 1.1)
+stepsize_callback = StepsizeCallback(cfl = 1.0)
 
 callbacks = CallbackSet(summary_callback,
                         analysis_callback,
@@ -339,3 +289,47 @@ warping scale to be 2.01. This mitigates numerical "noise" of the solution in th
 Some additional tips regarding a "nice" run up plot are to use the colorbar "Asymmetrical Earth Tones"
 for the bottom topography and set the colorbar for the water height to be a constant blue color
 with opacity 0.6.
+
+## Wave run-up and flooding
+
+Now, modify the setup to do force an wave input boundary condition at the `Top` part of the domain.
+For this purpose, modify a boundary condition function below
+```julia
+@inline function boundary_condition_wave_maker(u_inner, normal_direction::AbstractVector,
+                                               x, t, surface_flux_functions,
+                                               equations::ShallowWaterEquations2D)
+    # Extract the numerical flux functions to compute the conservative and nonconservative
+    # pieces of the approximation
+    surface_flux_function, nonconservative_flux_function = surface_flux_functions
+
+    # TODO: Create the information of the external water height and/or velocities
+
+    # Set the external solution state in the conservative variables
+    u_outer = SVector(???, ???, ???, u_inner[4])
+
+    # Calculate the boundary flux
+    flux = surface_flux_function(u_inner, u_outer, normal_direction, equations)
+
+    noncons_flux = nonconservative_flux_function(u_inner, u_outer, normal_direction,
+                                                 equations)
+
+    return flux, noncons_flux
+end
+```
+
+Then, you should also modify the container of the boundary conditions to be
+```julia
+boundary_condition = (; Bottom = BoundaryConditionDirichlet(initial_condition),
+                        Left = BoundaryConditionDirichlet(initial_condition),
+                        Right = BoundaryConditionDirichlet(initial_condition),
+                        Top = boundary_condition_wave_maker)
+```
+
+Experiment with different external boundary configurations or polynomial degrees to study how the solution changes.
+As a faster pipeline to visualize the solution directly after execution execute
+```julia
+iplot(sol)
+````
+This will allow you to plot and inspect the surface of the different solution quantities as well as the mesh used in the simulation.
+
+TODO: Gauge extraction
