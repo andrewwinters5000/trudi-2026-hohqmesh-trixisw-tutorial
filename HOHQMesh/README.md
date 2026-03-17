@@ -1,8 +1,13 @@
 # TRUDI 2026 -- HOHQMesh tutorial
 
-This provides a copy of the slides as well as the file needed to read-in the spline data.
+## Agenda
 
-TODO: Add details and such
+Broadly, the HOHQMesh portion of the tutorial is structured as:
+
+1. Overview of HOHQMesh strategy and control file structure
+2. Building a first control file
+3. Read-in with HOHQMesh.jl and generate with HOHQMesh.jl
+4. Interactive nozzle mesh creation.
 
 ## HOHQMesh.jl Quick Cheat Sheet
 
