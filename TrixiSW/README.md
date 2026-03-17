@@ -290,40 +290,20 @@ Some additional tips regarding a "nice" run up plot are to use the colorbar "Asy
 for the bottom topography and set the colorbar for the water height to be a constant blue color
 with opacity 0.6.
 
-## Wave run-up and flooding
+### Exercise: Create a wave-maker boundary conditions
+Next, we want to modify the boundary conditions in order to simulate a flood wave that is entering
+from the northern side of the domain. This can be done by completing the following steps:
 
-Now, modify the setup to do force an wave input boundary condition at the `Top` part of the domain.
-For this purpose, modify a boundary condition function below
-```julia
-@inline function boundary_condition_wave_maker(u_inner, normal_direction::AbstractVector,
-                                               x, t, surface_flux_functions,
-                                               equations::ShallowWaterEquations2D)
-    # Extract the numerical flux functions to compute the conservative and nonconservative
-    # pieces of the approximation
-    surface_flux_function, nonconservative_flux_function = surface_flux_functions
+- Determine the location of the riverbanks at the `Top` boundary condition `x_L` and `x_R`
 
-    # TODO: Create the information of the external water height and/or velocities
+- The `flood_wave` function specifies the time dependent shape of an incoming flood wave. 
+Create a new function `boundary_function_flood_wave` that depends on `x, t, equations`, which 
+prescribes the `flood_wave` that is restricted to the river mouth (between `x_L` and `x_R`).
 
-    # Set the external solution state in the conservative variables
-    u_outer = SVector(???, ???, ???, u_inner[4])
+- Set a `BoundaryConditionDirichlet` that prescribes the `boundary_function_flood_wave` at the `Top`
+  boundary.
 
-    # Calculate the boundary flux
-    flux = surface_flux_function(u_inner, u_outer, normal_direction, equations)
-
-    noncons_flux = nonconservative_flux_function(u_inner, u_outer, normal_direction,
-                                                 equations)
-
-    return flux, noncons_flux
-end
-```
-
-Then, you should also modify the container of the boundary conditions to be
-```julia
-boundary_condition = (; Bottom = BoundaryConditionDirichlet(initial_condition),
-                        Left = BoundaryConditionDirichlet(initial_condition),
-                        Right = BoundaryConditionDirichlet(initial_condition),
-                        Top = boundary_condition_wave_maker)
-```
+Run the modified elixir and take a look at the visualization in ParaView from safe distance!
 
 Experiment with different external boundary configurations or polynomial degrees to study how the solution changes.
 As a faster pipeline to visualize the solution directly after execution execute
