@@ -3,6 +3,8 @@
 #       (2) Put this and the nozzle.control into the repo
 #       (3) Add the manifest to the repository
 
+# TODO: Try to plot the project at the beginning and then as we add! things the plot should update automatically
+
 using HOHQMesh, GLMakie
 
 # make a new project
@@ -16,13 +18,13 @@ setPlotFileFormat!(p, "sem")
 addBackgroundGrid!(p, [0.5, 0.5, 0.0])
 
 # Outer boundary for this example
-nozzTop = new("nozzTop_spline", joinpath(@__DIR__, "Data", "NozzleTop.txt"))
+nozzTop = new("nozzTop_spline", joinpath(@__DIR__, "NozzleTop.txt"))
 add!(p, nozzTop)
 
 inlet = newEndPointsLineCurve("inlet", [-1.2610563, 1.6411425, 0.0], [-1.4184389, 1.0537827, 0.0])
 add!(p, inlet)
 
-nozzBot = newSplineCurve("nozzBot_spline", joinpath(@__DIR__, "Data", "NozzleBottom.txt"))
+nozzBot = newSplineCurve("nozzBot_spline", joinpath(@__DIR__, "NozzleBottom.txt"))
 addCurveToOuterBoundary!(p, nozzBot)
 
 ext1 = newEndPointsLineCurve("ext1", [0.0, 0.72965925, 0.0], [1.0, 0.5, 0.0])
@@ -51,7 +53,7 @@ add!(p, refineLine)
 refineCent1 = newRefinementCenter("refine_center", "sharp",
                                  [0.15, 1.2, 0.0],
                                  0.05,
-                                 0.25)
+                                 0.2)
 add!(p, refineCent1)
 
 

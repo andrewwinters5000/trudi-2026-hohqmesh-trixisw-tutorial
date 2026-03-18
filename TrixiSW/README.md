@@ -296,8 +296,8 @@ from the northern side of the domain. This can be done by completing the followi
 
 - Determine the location of the riverbanks at the `Top` boundary condition `x_L` and `x_R`
 
-- The `flood_wave` function specifies the time dependent shape of an incoming flood wave. 
-Create a new function `boundary_function_flood_wave` that depends on `x, t, equations`, which 
+- The `flood_wave` function specifies the time dependent shape of an incoming flood wave.
+Create a new function `boundary_function_flood_wave` that depends on `x, t, equations`, which
 prescribes the `flood_wave` that is restricted to the river mouth (between `x_L` and `x_R`).
 
 - Set a `BoundaryConditionDirichlet` that prescribes the `boundary_function_flood_wave` at the `Top`
@@ -305,11 +305,8 @@ prescribes the `flood_wave` that is restricted to the river mouth (between `x_L`
 
 Run the modified elixir and take a look at the visualization in ParaView from safe distance!
 
-Experiment with different external boundary configurations or polynomial degrees to study how the solution changes.
-As a faster pipeline to visualize the solution directly after execution execute
-```julia
-iplot(sol)
-````
-This will allow you to plot and inspect the surface of the different solution quantities as well as the mesh used in the simulation.
+### Exercise: Gauge extraction
 
-TODO: Gauge extraction
+TODO: Add silly story about buying chocolate before the wave hits the chocolate museum.
+TODO: update the ParaView state. Give them a point to try and then let them expertiment with IC or the wave maker.
+Critical wave amplitude that causes flooding. Change to a different poiint of interest if they want to.

@@ -122,7 +122,7 @@ analysis_callback = AnalysisCallback(semi, interval = analysis_interval,
 
 alive_callback = AliveCallback(analysis_interval = analysis_interval)
 
-save_solution = SaveSolutionCallback(dt = 10.0,
+save_solution = SaveSolutionCallback(dt = 2.0,
                                      save_initial_solution = true,
                                      save_final_solution = true)
 
