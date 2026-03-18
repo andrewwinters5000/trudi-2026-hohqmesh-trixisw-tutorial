@@ -24,6 +24,12 @@ function initial_condition_well_balanced(x, t, equations::ShallowWaterEquations2
     v1 = 0
     v2 = 0
     b = spline_func(x[1], x[2])
+
+    # It is mandatory to shift the water level at dry areas to make sure the water height h
+    # stays positive. The system would not be stable for h set to a hard zero due to division by h in
+    # the computation of velocity, e.g., (h v) / h. Therefore, a small dry state threshold
+    # with a default value of 500*eps() ≈ 1e-13 in double precision, is set in the constructor above
+    # for the ShallowWaterEquations and added to the initial condition if h = 0.
     H = max(equations.H0, b + equations.threshold_limiter)
 
     return prim2cons(SVector(H, v1, v2, b), equations)
@@ -37,10 +43,9 @@ function flood_wave(t, equations)
     kx = 1 / sqrt(30)
     t0 = 26.0
     arg = ( kx * (t - t0) ) / scal
-    L = 357250
-    w = 225
     eta = A * sech(arg)^2
-return eta
+    return eta
+end
 
 
 function boundary_function_flood_wave(x, t, equations::ShallowWaterEquations2D)
