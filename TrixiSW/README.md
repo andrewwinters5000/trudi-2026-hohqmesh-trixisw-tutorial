@@ -1,9 +1,5 @@
 # TRUDI 2026 -- TrixiShallowWater tutorial
 
-1) Step 1: Lake at rest will all Dircihlet or wall
-2) Step 2: add a wave type boundary / input wave at one of the boundaries
-3)
-
 This provides a copy of the slides regarding the TrixiShallowWater.jl features
 as well as the files needed to setup some interesting examples such as a bottom
 topography and flooding run.
@@ -13,7 +9,7 @@ Note, the instructions below assume that your Julia REPL is instantiated from th
 ## Lake-at-rest over complex bathymetry
 
 We begin with the general setup of a lake-at-rest test case with complex bottom topography.
-Below is information on component and how the `elixir_shallowwater_lake_at_rest.jl` is constructed.
+Below is information on component and how the `elixir_shallowwater_wave_runup_flood_exercise_version.jl` is constructed.
 
 This example will demonstrate how to:
 - Set up a SWE solver for wet/dry transitions
@@ -47,8 +43,6 @@ using Trixi2Vtk
 ### Visualize the bathymetry
 First, we construct the L1 spline approximation of the bathymetry data
 provided in the file `"dgm_merged.txt"`.
-We will then visualize the bathymetry to aid in the design of an appropriate
-wave maker boundary condition later.
 To create the L1 spline approximation execute
 ```julia
 # Point to the two dimensional bottom data
@@ -81,7 +75,7 @@ surface(x_int_pts, y_int_pts, z_int_pts';
 ```
 
 ### Create a quadrilateral mesh
-We can use HOHQMesh.jl to create a Cartesian mesh
+We use HOHQMesh.jl to create a Cartesian mesh
 (although a bit of overkill it makes creating the boundary condition later easier
 due to normal vector and boundary naming conventions).
 
@@ -290,11 +284,15 @@ Some additional tips regarding a "nice" run up plot are to use the colorbar "Asy
 for the bottom topography and set the colorbar for the water height to be a constant blue color
 with opacity 0.6.
 
+>[!TIP]
+>One can visualize the bathymetry in ParaView and activate the "Data Axis Grid" to aid in the design of an appropriate
+>wave maker boundary condition in the next exercise.
+
 ### Exercise: Create a wave-maker boundary conditions
 Next, we want to modify the boundary conditions in order to simulate a flood wave that is entering
 from the northern side of the domain. This can be done by completing the following steps:
 
-- Determine the location of the riverbanks at the `Top` boundary condition `x_L` and `x_R`
+- Determine the location of the riverbanks `x_L` and `x_R` where (approximately) the resting water level intersects the bottom topography at the `Top` boundary of the domain.
 
 - The `flood_wave` function specifies the time dependent shape of an incoming flood wave.
 Create a new function `boundary_function_flood_wave` that depends on `x, t, equations`, which
@@ -307,6 +305,14 @@ Run the modified elixir and take a look at the visualization in ParaView from sa
 
 ### Exercise: Gauge extraction
 
-TODO: Add silly story about buying chocolate before the wave hits the chocolate museum.
-TODO: update the ParaView state. Give them a point to try and then let them expertiment with IC or the wave maker.
-Critical wave amplitude that causes flooding. Change to a different poiint of interest if they want to.
+As a final exercise, suppose you are purchasing chocolate at the Schokoladenmuseum Köln.
+This is located (approximately) at the point `(356957.0, 5644260.0, 0.0)` in the domain.
+Open the provided ParaView state file `wave_state_with_gauge.pvsm` in ParaView and adjust
+it to point to your postprocessed data from the previous exercise.
+If this worked properly then the loaded ParaView state should look something like the image below
+
+![ParaView_setup](paraview_setup.png)
+
+- Adjust the amplitude `A` in the `flood_wave` function so that the arrival time of the flood wave is around 50 s.
+- Experiment with the amplitude `A` to obtain a flooding level at the Schokoladenmuseum of approximately 70 m.
+- Try a different point location in Cologne for the gauge extraction, e.g., the plaza right in front of the Cathedral is the point `(356442.0, 5645280.0, 0.0)`. Adjust the amplitude `A` to experiment with the flood level at your newly selected point.

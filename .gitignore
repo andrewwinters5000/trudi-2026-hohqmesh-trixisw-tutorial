@@ -12,5 +12,18 @@
 *.toc
 *.tex
 
-# folder from runs
+# HOHQMesh junk
+*.txt
+*.mesh
+*.inp
+*.tec
+
+# Julia junk
+*.jl
+
+# folders from runs
 out/*
+out_nodewise/*
+
+# results
+*.mp4
